@@ -102,11 +102,45 @@ mycoder --resume                              # 恢复上次会话
 
 ## 工作原理
 
-1. 用户输入问题或任务
-2. LLM 分析意图，决定调用哪些工具
-3. 工具执行（读文件、搜索、运行命令等），结果返回给 LLM
-4. LLM 根据结果继续推理，直到任务完成
-5. 输出最终回复，会话自动保存到本地
+```mermaid
+flowchart TD
+    A([用户输入]) --> B[__main__.py\nCLI 解析 / REPL 循环]
+
+    B --> C[prompt.py\n构建 System Prompt]
+    C --> C1[注入 git 状态]
+    C --> C2[注入 CLAUDE.md 规则]
+    C --> C3[注入持久化记忆]
+    C1 & C2 & C3 --> D
+
+    D[agent.py\nAgent 主循环] --> E{选择后端}
+    E -->|ANTHROPIC_API_KEY| F[Anthropic Stream\n流式解析 content_block]
+    E -->|OPENAI_API_KEY + BASE_URL| G[OpenAI-compatible Stream\n流式解析 delta.tool_calls]
+
+    F & G --> H[参数碎片拼装\n等待 content_block_stop]
+    H --> I{工具权限检查}
+
+    I -->|只读工具\nread / list / grep / web| J[早启动 Early Execution\n并行异步执行，不等确认]
+    I -->|编辑工具\nwrite / edit| K{Permission Mode}
+    I -->|终端命令\nrun_shell| K
+
+    K -->|default / acceptEdits| L[弹出确认提示]
+    K -->|yolo / bypassPermissions| M[直接执行]
+    L -->|用户同意| M
+    L -->|用户拒绝| N[跳过，返回拒绝消息]
+
+    J & M & N --> O[工具结果追加到对话历史]
+    O --> P{上下文用量检查}
+
+    P -->|> 50% 单结果截断 30k| Q[Tier 1: 截断超长工具结果]
+    P -->|> 60% 删除旧结果| R[Tier 2: 旧工具结果替换为占位符]
+    P -->|> 70% 严格截断 15k| S[Tier 3: 全部结果限制 15k]
+    P -->|> 85% LLM 压缩| T[Tier 4: LLM 总结整个对话历史]
+    Q & R & S & T --> U
+
+    P -->|正常| U[session.py\n自动保存会话到本地 JSON]
+    U --> D
+    D -->|stop_reason = end_turn| V([输出最终回复])
+```
 
 ---
 
