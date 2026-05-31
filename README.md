@@ -1,6 +1,6 @@
-# MyCoder
-
 <div align="center">
+
+# MyCoder
 
 **一个轻量级的 AI 代码助手 CLI**
 
@@ -14,11 +14,13 @@
 
 ## 效果预览
 
-**启动与对话**
-![demo1](./assets/demo1.png)
+<div align="center">
 
-**工具调用**
-![demo2](./assets/demo2.png)
+| 启动与对话 | 工具调用 |
+|:---:|:---:|
+| <img src="./assets/demo1.png" width="480"/> | <img src="./assets/demo2.png" width="480"/> |
+
+</div>
 
 ---
 
