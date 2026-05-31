@@ -14,7 +14,11 @@
 
 ## 效果预览
 
-![demo](./assets/demo.png)
+**启动与对话**
+![demo1](./assets/demo1.png)
+
+**工具调用**
+![demo2](./assets/demo2.png)
 
 ---
 
