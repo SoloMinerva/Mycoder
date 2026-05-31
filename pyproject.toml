@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=42"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mycoder"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = [
+    "anthropic>=0.40.0",
+    "openai>=1.50.0",
+    "rich>=13.0.0",
+    "requests>=2.30.0",
+    "beautifulsoup4>=4.12.0",
+]
+
+[project.scripts]
+mycoder = "mycoder.__main__:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["mycoder*"]
